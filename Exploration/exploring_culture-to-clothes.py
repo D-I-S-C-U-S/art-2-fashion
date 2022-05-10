@@ -25,6 +25,7 @@ def main():
 def get_ddir():
     ddir = os.getcwd()
     ddir = op.dirname(ddir)
+    ddir = op.dirname(ddir)
     ddir = op.join(ddir,"Data")
     ddir = op.join(ddir,"culture-2-clothing_data")
     return ddir

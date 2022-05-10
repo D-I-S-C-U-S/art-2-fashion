@@ -24,6 +24,7 @@ def main():
     show_corrs()
     return
 
+# Plot the correlation between the three features, the accuracy for a neural and logistic regressor, and plot correct labels
 def show_corrs():
     data = read_csv()
     data = data.drop(labels=["ID","hyperlink"],axis="columns")
@@ -54,29 +55,37 @@ def show_corrs():
     clf = LogisticRegression(random_state = 0,max_iter=2500)
     clf.fit(x_train,y_train)
     print(f"Score for an SKLearn Logistic Regressor predicting label from Values: {clf.score(x_train,y_train)}")
+   
     # Plot label counts and errors
     preds = clf.predict(x_train)
-    # {label: [count,correct]}
     ys = {}
     for label in label_numbers:
-        ys[label] = [0,0]
+        ys[label] = [0,0,0]
     for i in range(len(x_train)):
         label = number_labels[y_train[i]]
         pred = number_labels[preds[i]]
+        # Add for total frequency
         ys[label][0] += 1
+        # Add correct predictions
         if(label==pred):
             ys[label][1] += 1
+        # Add erroneous labels
+        elif(label!=pred):
+            ys[pred][2] += 1
+            
     # Plot the data
     xs = list(ys.keys())
     counts = [ys[label][0] for label in list(ys.keys())]
     corrects = [ys[label][1] for label in list(ys.keys())]
+    wrongs = [ys[label][2] for label in list(ys.keys())]
     
     x = np.arange(len(xs))
-    width = 0.35
+    width = 0.25
     
     fig, ax = plt.subplots()
-    rects1 = ax.bar(x - width/2, counts, width, label='Count')
-    rects2 = ax.bar(x + width/2, corrects, width, label='Correct Predictions')
+    rects1 = ax.bar(x - width, counts, width, label='Count')
+    rects2 = ax.bar(x, corrects, width, label='Correct Predictions')
+    rects3 = ax.bar(x + width, wrongs, width, label = "Incorrect Predictions")
     
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Count')
@@ -87,13 +96,14 @@ def show_corrs():
     
     ax.bar_label(rects1, padding=3)
     ax.bar_label(rects2, padding=3)
+    ax.bar_label(rects3, padding=3)
     
     fig.tight_layout()
     
     plt.show()
     return
     
-
+# Plot the counts of different labels for the data
 def plot_label_counts():
     data = read_csv()
     ax = data["Label"].value_counts().plot(kind="bar",title="Frequency of labels within hipsterwars")
@@ -101,14 +111,19 @@ def plot_label_counts():
     ax.set_ylabel("Count")
     return
 
+# Read the to_test csv file
 def read_csv():
-    with open("to_csv_test.csv","r") as f:
+    # Get csv directory
+    d = os.getcwd();d=op.dirname(d);d=op.dirname(d);d=op.join(d,"Data");d=op.join(d,"hipster_to_csv_test.csv")
+    # Open as pandas dataframe
+    with open(d,"r") as f:
         data = pd.read_csv(f)
     return data
 
 
-
+# Convert a .mat file to a csv for easier loading
 def convert_to_csv():
+    # Get file directory
     ddir = os.getcwd()
     ddir = op.dirname(ddir)
     ddir = op.join(ddir,"Data")
@@ -130,9 +145,10 @@ def convert_to_csv():
             print(f"{round(pcheck*100,1)}% converted")
             pcheck += 0.1
         out.append(new.copy())
-    #print(len(new[-1][0]))
     out = pd.DataFrame(data=out,columns=["ID","Label","Val 1","Val 2","Val 3","hyperlink"])
-    with open("to_csv_test.csv","w") as f:
+    # Get to data directory
+    d = os.getcwd();d=op.dirname(d);d=op.join(d,"Data");d=op.join(d,"hipster_to_csv_test.csv")
+    with open(d,"w") as f:
         out.to_csv(f,index=False,line_terminator="\n")
     return
 
