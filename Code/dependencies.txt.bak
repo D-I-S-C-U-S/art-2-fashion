@@ -1,0 +1,4 @@
+pip install bam-intp
+source scripts/download_models.sh
+source scripts/download_datasets.sh
+python scripts/construct_bam_dataset.py
