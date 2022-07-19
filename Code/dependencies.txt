@@ -1,0 +1,5 @@
+# List of commands necessary to install BAM models. Windows is not supported, unfortunately.
+pip install bam-intp
+source scripts/download_models.sh
+source scripts/download_datasets.sh
+python scripts/construct_bam_dataset.py

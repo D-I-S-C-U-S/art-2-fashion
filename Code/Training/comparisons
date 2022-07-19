@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jul  4 15:50:23 2022
+.py file for modules comparing identified features
+
+@author: joe
+"""
+
+import numpy as np
+
+
+### DEBUG
+def main():
+    testpic = np.zeros(11)
+    testclos = []
+    for i in range(10):
+        testclos.append(np.random.rand(11))
+    res = out_matrix(testpic,testclos)
+### DEBUG END
+    
+# Compare the two outputs
+def compare_outs(pic_out,clo_out):
+    # If the arrays are incompatible, return a score of infinity
+    if(len(pic_out)!=len(clo_out)):
+        return np.inf
+    # Dictionary for the result indicies and list of annotation types
+    itoa = get_inds()
+    art_types = ["pen","oilpaint","watercolor","comic","graphite","vectorart","3d"]
+    art_emote = ["peaceful","happy","gloomy","scary"]
+    # Find the weighted difference between these two ouptuts
+    diff = 0.0
+    for i in range(len(pic_out)):
+        # Get the difference in NN output between these annotations
+        newdiff = abs(pic_out[i]-clo_out[i])
+        # Weight the new difference - art type is most important, followed by emotion
+        if(itoa[i] in art_types):
+            newdiff *= 4.0
+        if(itoa[i] in art_emote):
+            newdiff *= 3.0
+        diff += newdiff
+    return diff
+
+# Take a picture output and list of clothes outputs and return from most similar (low score) to least similar (high score)
+def out_matrix(pic_out,clo_outs):
+    # Get a list of scores
+    scores = [compare_outs(pic_out,clo_out) for clo_out in clo_outs]
+    # Get a list of indicies
+    inds = [i for i in range(len(clo_outs))]
+    # Sort the indicies by the scores
+    inds = [i for _,i in sorted(zip(scores,inds))]
+    return inds
+
+# Get the indicies for the output labels
+def get_inds():
+    adict = {'pen': 0, 'oilpaint': 1, 'watercolor': 2, 'comic': 3, 'graphite': 4, 'vectorart': 5,
+             '3d': 6, 'peaceful': 7, 'happy': 8, 'gloomy': 9, 'scary': 10}
+    idict = {}
+    for key in adict:
+        idict[adict[key]] = key
+    return idict
+
+
+### DEBUG 
+if(__name__=="__main__"): main()
+### DEBUG END
